@@ -1,0 +1,107 @@
+import React, { use } from 'react'
+import { manageJobsData } from '../assets/assets'
+import moment from 'moment'
+import { useNavigate } from 'react-router-dom';
+import { useContext } from 'react';
+import { AppContext } from '../context/AppContext';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import { useEffect } from 'react';
+import { useState } from 'react';
+import Loading from '../components/Loading';
+
+const ManageJobs = () => {
+    const navigate=useNavigate();
+    const [jobs,setJobs]=useState(false);
+    const {companyToken,backendUrl}=useContext(AppContext);
+
+    //Function to fetch jobs posted by the company can be added here using useEffect and axios
+   const fetchCompanyJobs= async()=>{
+     try{
+      const {data}= await axios.get(backendUrl+"/api/company/list-jobs",
+        {headers:{token:companyToken}});
+        if(data.success){
+         setJobs(data.jobsData.reverse());
+         console.log(data.jobsData);
+
+
+        }else{
+          toast.error(data.message);
+        }
+
+    }catch(err){
+      toast.error(err.message);
+    }
+   }
+   //Function to handle job visibility toggle can be added here
+   const changeJobVisibility= async(id)=>{
+    try{
+      const {data}= await axios.post(backendUrl+"/api/company/change-visibility",
+      {
+        id
+      },
+      {headers:{token:companyToken}});
+      if(data.success){
+        fetchCompanyJobs();
+        toast.success(data.message);
+      }else{
+        toast.error(data.message);
+      }
+    }catch(err){
+      toast.error(err.message);
+    }
+   }
+
+
+   useEffect(()=>{
+    if(companyToken){
+      fetchCompanyJobs();
+    }
+    },[companyToken]);
+
+  return jobs ? jobs.length==0 ? 
+  (
+  <div className='flex items-center justify-center h-[65vh]'>
+    <p className='text-xl sm:text-2xl'>No jobs Posted or Available</p>
+    </div>
+    ) 
+  :(
+    <div className='container p-4 max-w-5xl'>
+      <div className='overflow-x-auto'>
+        <table className='min-w-full bg-white border border-gray-200 max-sm:text-sm'>
+            <thead>
+                <tr>
+                    <th className='py-2 px-4 border-b text-left max-sm:hidden'>#</th>
+                    <th className='py-2 px-4 border-b text-left'>Job Title</th>
+                    <th className='py-2 px-4 border-b text-left max-sm:hidden'>Location</th>
+                    <th className='py-2 px-4 border-b text-left max-sm:hidden'>Date</th>
+                    <th className='py-2 px-4 border-b text-left'>Applicants</th>
+                    <th className='py-2 px-4 border-b text-left'>Visible</th>
+                </tr>
+            </thead>
+            <tbody>
+                {jobs.map((job, index) => (
+                    <tr key={index} className='text-gray-700'>
+                        <td className='py-2 px-4 border-b max-sm:hidden'>{index + 1}</td>
+                        <td className='py-2 px-4 border-b'>{job.title}</td>
+                        <td className='py-2 px-4 border-b max-sm:hidden'>{job.location}</td>
+                        <td className='py-2 px-4 border-b max-sm:hidden'>{moment(job.date).format('ll')}</td>
+                        <td className='py-2 px-4 border-b text-center'>{job.applicants}</td>
+
+                        <td  className='py-2 px-4 border-b'>
+                            <input type="checkbox"  className='scale-125 ml-4 '
+                            checked={job.visible} onChange={()=>changeJobVisibility(job._id)} />
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+      </div>
+      <div className='mt-4 flex justify-end'>
+        <button onClick={()=>navigate('/dashboard/add-job')} className='bg-black text-white py-2 px-4 rounded cursor-pointer'>Add New Job</button>
+      </div>
+    </div>
+  ):<Loading />;
+}
+
+export default ManageJobs
