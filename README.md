@@ -170,7 +170,7 @@ VITE_BACKEND_URL=http://localhost:5000
 
 ```bash
 # Clone the repository
-git clone https://github.com/Arshkhan18/Job_Portal.git
+git clone https://github.com/nehru008/InsiderJobs
 cd Job_Portal
 
 # Install server dependencies

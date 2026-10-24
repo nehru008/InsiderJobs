@@ -30,8 +30,9 @@ app.use("/api/users", clerkMiddleware(), userRoutes);
 app.get("/", (req, res) => {
   res.send("Api is running...");
 });
-  app.use("/api/company", companyRoutes);
-  app.use("/api/jobs", jobRoutes);
+
+app.use("/api/company", companyRoutes);
+app.use("/api/jobs", jobRoutes);
 
 const PORT = process.env.PORT || 5000;
 

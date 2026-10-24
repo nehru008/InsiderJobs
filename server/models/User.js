@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
-    _id:{type:String,required:true},
+  _id:{
+    type:String,
+    required:true
+  },
   name: {
     type: String,
     required: true,
@@ -13,8 +16,9 @@ const userSchema = new mongoose.Schema({
   },
   resume: {
     type: String},
-    image: {
-    type: String}
+  image: {
+    type: String
+  }
 });
 
 const User = mongoose.model("User", userSchema);
